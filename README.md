@@ -1,0 +1,1 @@
+﻿less-like big files viewer
