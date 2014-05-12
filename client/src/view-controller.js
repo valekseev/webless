@@ -6,8 +6,8 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.lineHeight = 15;
     $scope.letterHeight = 13;
-    $scope.letterWidth = Math.round($scope.letterHeight*0.6);
-//    $scope.letterWidth = $scope.letterHeight*0.6;
+    $scope.letterWidth = Math.round($scope.letterHeight*0.6); // in
+//    $scope.letterWidth = $scope.letterHeight*0.6; // in IE
 
 //    $scope.scrollLineHeight = 3;
 //    $scope.scrollLetterHeight = 3;
@@ -46,16 +46,12 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
         };
     };
 
-    $scope.scrollStyle = function() {
-        return {
-//            'height' : $scope.viewHeight * $scope.lineHeight,
-            'width' : $scope.viewWidth * $scope.letterWidth,
-            'font-size': $scope.letterHeight + 'px'
-        };
-    };
-
     $scope.scrollbarScroll = function() {
         return Math.round($scope.lines[0].position / $scope.fileSize * $scope.viewHeight * $scope.lineHeight * 4);
+    };
+
+    $scope.scrollTop = function () {
+        return $scope.viewScroll * $scope.lineHeight;
     };
 
     // Validates new position(wrapped) and requests new lines from cache if needed
@@ -148,6 +144,8 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.keyPressed = function(e) {
         switch(e.keyCode) {
+            case 36: scrollHome(); break;                        //Home
+            case 35: scrollToEnd(); break;                       //End
             case 87:                                             //w
             case 33: $scope.moveView(-$scope.viewHeight); break; //page up
             case 32:                                             //space
@@ -172,6 +170,18 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
             $scope.moveView(-1);
         }
     };
+
+    function scrollHome() {
+        $scope.lines = $cache.retrieveFrom(0, bufferedLines());
+        $scope.viewScroll = 0;
+        recalculateWrappedMap();
+    }
+
+    function scrollToEnd() {
+        $scope.lines = $cache.retrieveFrom($scope.fileSize, -bufferedLines());
+        recalculateWrappedMap();
+        $scope.viewScroll = wrappedToLineMap.length - $scope.viewHeight;
+    }
 
     $scope.scrollTo = function (fraction) {
         var pos = Math.round($scope.fileSize * fraction);

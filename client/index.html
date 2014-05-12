@@ -22,9 +22,9 @@
     <div class="log-header" drag>testlog.log</div>
     <div class="log-container" ngc-wheelmove="wheelMoved($event)" tabindex="0">
         <!--ng-style="{height: lineWrappedSizes[$index] * lineHeight}"-->
-        <div ngc-scrolltop="viewScroll * lineHeight" ng-style="viewStyle()" class="lines-view">
+        <div ngc-scrolltop="scrollTop()" ng-style="viewStyle()" class="lines-view">
             <div ng-repeat="line in lines track by line.position" >
-                <div class="select-column"></div><div class="view-column">{{line.line}}</div>
+                <div class="select-column">{{lineWrappedSizes[$index]}}</div><div class="view-column">{{line.line}}</div>
             </div>
         </div>
         <div id="scroll-panel" class="scroll-panel">

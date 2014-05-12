@@ -22,16 +22,6 @@
     /*width:auto;*/
 }
 
-.select-panel {
-    overflow: hidden;
-    /*white-space:nowrap;*/
-    /*font-size:15px;*/
-    /*font-family:courier, "courier new", monospace;*/
-    /*resize: both;*/
-    border: 1px solid black;
-    float:left;
-}
-
 .lines-view {
     overflow: hidden;
     word-break:break-all;
@@ -63,9 +53,9 @@
     overflow: hidden;
     width: 20px;
     float: left;
-    font-size: 8px;
+    font-size: 12px;
     min-height: 1px;
-    border-top: 1px solid black;
+    /*border-top: 1px solid black;*/
 }
 
 .view-column {
