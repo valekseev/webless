@@ -1,0 +1,94 @@
+.log-container2 {
+    height:400px;
+    width:400px;
+}
+
+.log-header {
+}
+
+.log-container {
+    /*font-size:13px;*/
+    /*font-family:courier, "courier new", monospace;*/
+    font-family: "Courier New",Courier, mono, serif;
+    float: left;
+}
+
+.width-test {
+    /*font-size:13px;*/
+    /*font-family:courier, "courier new", monospace;*/
+    font-family: "Courier New",Courier, mono, serif;
+    font-size:13px;
+    /*height:auto;*/
+    /*width:auto;*/
+}
+
+.select-panel {
+    overflow: hidden;
+    /*white-space:nowrap;*/
+    /*font-size:15px;*/
+    /*font-family:courier, "courier new", monospace;*/
+    /*resize: both;*/
+    border: 1px solid black;
+    float:left;
+}
+
+.lines-view {
+    overflow: hidden;
+    word-break:break-all;
+    /*white-space:nowrap;*/
+    /*font-size:15px;*/
+    /*font-family:courier, "courier new", monospace;*/
+    /*resize: both;*/
+    border: 1px solid black;
+    float:left;
+    line-height: 15px;
+}
+
+.scroll-panel {
+    white-space: nowrap;
+    overflow: hidden;
+    word-break:break-all;
+    width:250px;
+    font-size:3px;
+    line-height: 3px;
+    /*white-space:nowrap;*/
+    /*font-family:courier, "courier new", monospace;*/
+    /*resize: both;*/
+    /*border: 1px solid black;*/
+    float:left;
+}
+
+.select-column {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 20px;
+    float: left;
+    font-size: 8px;
+    min-height: 1px;
+    border-top: 1px solid black;
+}
+
+.view-column {
+    border-left: 1px solid;
+    overflow: hidden;
+    word-break:break-all;
+}
+
+.scroll-bar {
+    overflow-y: scroll;
+    height:100%;
+    width:20px;
+}
+
+.scroll-spacer {
+    height:500%;
+}
+
+.bg-blue {
+    background-color: blue;
+}
+
+.bg-grey {
+    background-color: grey;
+}
+

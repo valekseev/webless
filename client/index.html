@@ -1,0 +1,41 @@
+<html ng-app="webless" ng-controller="ViewController">
+<head>
+    <script src="lib/angular.js"></script>
+    <script src="lib/bs.js"></script>
+    <script src="src/directives.js"></script>
+    <script src="src/cache.js"></script>
+    <script src="src/view-controller.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+<div ng-keydown="keyPressed($event)">
+    <div>len: {{lines.length}} viewStart: {{lines[0].position}} viewScroll: {{viewScroll}} ({{viewUnwrappedScroll()}}) {{viewStyle()}}</div>
+    <div>cached: {{cacheSize}} fileSize: {{fileSize}}</div>
+    <input type="button" ng-click="moveView(1)" value="down"/>
+    <input type="number" ng-model="viewHeight"/>
+    <input type="number" ng-model="viewWidth"/>
+    <input type="checkbox" ng-model="isWrapped"/> Wrap
+    <span id="width-test" class="width-test">a</span>
+
+    <div class="log-header" drag>testlog.log</div>
+    <div class="log-container" ngc-wheelmove="wheelMoved($event)" tabindex="0">
+        <!--ng-style="{height: lineWrappedSizes[$index] * lineHeight}"-->
+        <div ngc-scrolltop="viewScroll * lineHeight" ng-style="viewStyle()" class="lines-view">
+            <div ng-repeat="line in lines track by line.position" >
+                <div class="select-column"></div><div class="view-column">{{line.line}}</div>
+            </div>
+        </div>
+        <div id="scroll-panel" class="scroll-panel">
+            <!--<pre>{{scrollText}}</pre>-->
+            <div ng-class="{'bg-blue':$index===viewUnwrappedScroll() || $index=== viewUnwrappedEnd()}"
+                 ng-repeat="line in lines track by line.position">{{line.line}}</div>
+        </div>
+    </div>
+    <div ngc-syncscroll="scrollTo($fraction)" id="scroll-bar" class="scroll-bar" ngc-scrolltop="scrollbarScroll()" ng-style="{height: viewHeight * lineHeight}">
+        <div id="scroll-spacer" class="scroll-spacer"></div>
+    </div>
+</div>
+</body>
+</html>

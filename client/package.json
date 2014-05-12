@@ -1,0 +1,6 @@
+{
+  "name": "webless",
+  "version": "0.0.0",
+  "description": "less-like big files viewer",
+  "dependencies": {"binarysearch": "~0.2.4"}
+}
