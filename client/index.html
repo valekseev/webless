@@ -11,8 +11,7 @@
 
 <body>
 <div ng-keydown="keyPressed($event)">
-    <div>len: {{lines.length}} viewStart: {{lines[0].position}} viewScroll: {{viewScroll}} ({{viewUnwrappedScroll()}}) {{viewStyle()}}</div>
-    <div>cached: {{cacheSize}} fileSize: {{fileSize}}</div>
+    <div>len: {{lines.length}} viewStart: {{lines[0].position}} viewScroll: {{viewScroll}} ({{viewUnwrappedScroll()}}) | cached: {{cacheSize}} fileSize: {{fileSize}} | {{viewStyle()}} </div>
     <input type="button" ng-click="moveView(1)" value="down"/>
     <input type="number" ng-model="viewHeight"/>
     <input type="number" ng-model="viewWidth"/>
