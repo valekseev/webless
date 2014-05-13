@@ -16,7 +16,8 @@ angular.module('webless.services', []).service('$cache', function() {
         var position = positionFrom;
         var entry = cache[position];
         if (entry === undefined) {
-            entry = cache[positions[bs.closest(positions, position)]];
+            position = positions[bs.closest(positions, position)];
+            entry = cache[position];
             //TODO: add prev check
         }
         var isPositive = linesNumber >= 0;
@@ -42,7 +43,7 @@ angular.module('webless.services', []).service('$cache', function() {
         return data.length;
     };
 
-    this.fileSize = function (){
+    this.fileSize = function () {
         return linePos;
     };
 

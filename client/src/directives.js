@@ -15,13 +15,21 @@ window.angular.module('webless.directives', [])
                 };
             }
         };
-    }]).directive('ngcScrolltop', function () { 'use strict';
+    }]).directive('ngcScrolltop', function ($timeout) { 'use strict';
         return {
+            priority: 0,
             link : function (scope, element, attrs) {
                 scope.$watch(attrs.ngcScrolltop, function (scroll) {
                     // console.log(element.parent());
-                    element[0].scrollTop = scroll;
-                    element.parent()[0].focus();
+                        if (element[0].scrollHeight <= scroll) {
+                            $timeout(function() {
+                                element[0].scrollTop = scroll;
+                            });                                
+                        } else {
+    	                    element[0].scrollTop = scroll;
+                        }
+//	                    element.parent()[0].focus();
+
                 });
             }
         };
@@ -33,7 +41,7 @@ window.angular.module('webless.directives', [])
                     element.on('scroll', function(event) {
                         scope.$apply(function() {
                             fn(scope, {
-                                $fraction : element.prop('scrollTop') / element.prop('offsetHeight')
+                                $fraction : element.prop('scrollTop') / (element.prop('scrollHeight') - element.prop('offsetHeight'))
                             });
                         });
                     });

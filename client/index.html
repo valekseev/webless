@@ -15,25 +15,33 @@
     <input type="button" ng-click="moveView(1)" value="down"/>
     <input type="number" ng-model="viewHeight"/>
     <input type="number" ng-model="viewWidth"/>
-    <input type="checkbox" ng-model="isWrapped"/> Wrap
-    <span id="width-test" class="width-test">a</span>
+    <label><input type="checkbox" ng-model="isWrapped"/>Wrap</label>
+    Hide:
+    <label><input type="checkbox" ng-model="showSelect"/>Select</label>
+    <label><input type="checkbox" ng-model="showVicinity"/>Vicinity</label>
+    <label><input type="checkbox" ng-model="showScrollbar"/>Scroll</label>
+
+    <!--span id="width-test" class="width-test">a</span-->
 
     <div class="log-header" drag>testlog.log</div>
     <div class="log-container" ngc-wheelmove="wheelMoved($event)" tabindex="0">
         <!--ng-style="{height: lineWrappedSizes[$index] * lineHeight}"-->
         <div ngc-scrolltop="scrollTop()" ng-style="viewStyle()" class="lines-view">
             <div ng-repeat="line in lines track by line.position" >
-                <div class="select-column">{{lineWrappedSizes[$index]}}</div><div class="view-column">{{line.line}}</div>
+                <div ng-if="showSelect" class="select-column"></div>
+                <div class="view-column">{{line.line}}</div>
             </div>
         </div>
-        <div id="scroll-panel" class="scroll-panel">
-            <!--<pre>{{scrollText}}</pre>-->
+
+        <!--<pre>{{scrollText}}</pre>-->
+        <div ng-if="showVicinity" id="scroll-panel" class="scroll-panel">
             <div ng-class="{'bg-blue':$index===viewUnwrappedScroll() || $index=== viewUnwrappedEnd()}"
                  ng-repeat="line in lines track by line.position">{{line.line}}</div>
         </div>
-    </div>
-    <div ngc-syncscroll="scrollTo($fraction)" id="scroll-bar" class="scroll-bar" ngc-scrolltop="scrollbarScroll()" ng-style="{height: viewHeight * lineHeight}">
-        <div id="scroll-spacer" class="scroll-spacer"></div>
+
+        <div ng-if="showScrollbar" ngc-syncscroll="scrollTo($fraction)" id="scroll-bar" class="scroll-bar" ngc-scrolltop="scrollbarScroll()" ng-style="{height: viewHeight * lineHeight}">
+            <div id="scroll-spacer" class="scroll-spacer"></div>
+        </div>
     </div>
 </div>
 </body>
