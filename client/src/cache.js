@@ -9,10 +9,27 @@ angular.module('webless.services', []).service('$cache', function() {
     var lineLength;
     var bs = require('binarysearch');
 
+    this.retrieveAllLines = function(positionFrom, linesNumber, scroll) {
+        var lines = [];
+        var actualScroll;
+        if (positionFrom<0 || positionFrom > this.fileSize()) { return lines; }
+        lines = this.retrieveFrom(positionFrom, -scroll - 1, true);
+        actualScroll = lines.length;
+        lines = lines.concat(this.retrieveFrom(positionFrom, linesNumber - lines.length));
+        if (lines.length<linesNumber){
+            actualScroll+=linesNumber - lines.length-1;
+            lines = this.retrieveFrom(lines[0].position, linesNumber - lines.length, true).concat(lines);
+        }
+        return {
+            lines : lines,
+            scroll : actualScroll
+        };
+    };
+
     this.retrieveFrom = function(positionFrom, linesNumber, isSkipFirst) {
         var lines = [];
-        if (positionFrom<0 || positionFrom > this.fileSize()) { return lines; }
         var i;
+        if (positionFrom<0 || positionFrom > this.fileSize()) { return lines; }
         var position = positionFrom;
         var entry = cache[position];
         if (entry === undefined) {

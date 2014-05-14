@@ -26,9 +26,9 @@ window.angular.module('webless.directives', [])
                                 element[0].scrollTop = scroll;
                             });                                
                         } else {
-    	                    element[0].scrollTop = scroll;
+                            element[0].scrollTop = scroll;
                         }
-//	                    element.parent()[0].focus();
+                    element.parent()[0].focus();
 
                 });
             }
