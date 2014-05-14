@@ -6,7 +6,7 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.lineHeight = 15;
     $scope.letterHeight = 13;
-    $scope.letterWidth = Math.round($scope.letterHeight*0.6); // in
+    $scope.letterWidth = Math.round($scope.letterHeight*0.6);
 //    $scope.letterWidth = $scope.letterHeight*0.6; // in IE
 
     $scope.isWrapped = true;
@@ -118,9 +118,6 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
         var newData = $cache.retrieveFrom($scope.lines[$scope.lines.length -1].position, slide, true);
         var realSlide = newData.length;
-        if (realSlide !== slide) {
-            console.log('aaa');
-        }
         if (realSlide === 0) { return; }
         $scope.lines = $scope.lines.concat(newData).slice(realSlide);
 
@@ -162,8 +159,8 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.keyPressed = function(e) {
         switch(e.keyCode) {
-            case 36: scrollHome(); break;                        //Home
-            case 35: scrollToEnd(); break;                       //End
+            case 36: $scope.scrollTo(0);                  break; //Home
+            case 35: $scope.scrollTo(1);                  break; //End
             case 87:                                             //w
             case 33: $scope.moveView(-$scope.viewHeight); break; //page up
             case 32:                                             //space
@@ -171,7 +168,7 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
             case 38: $scope.moveView(-1);                 break; //up
             case 40: $scope.moveView(1);                  break; //down
         }
-        console.log(e.keyCode);
+//        console.log(e.keyCode);
     };
 
     $scope.wheelMoved = function(e) {
@@ -188,18 +185,6 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
             $scope.moveView(-1);
         }
     };
-
-    function scrollHome() {
-        $scope.lines = $cache.retrieveFrom(0, bufferedLines());
-        $scope.viewScroll = 0;
-        recalculateWrappedMap();
-    }
-
-    function scrollToEnd() {
-        $scope.lines = $cache.retrieveFrom($scope.fileSize, -bufferedLines());
-        recalculateWrappedMap();
-        $scope.viewScroll = wrappedToLineMap.length - $scope.viewHeight;
-    }
 
     $scope.scrollbarScroll = function() {
         var line = $scope.lines[$scope.viewUnwrappedScroll()];

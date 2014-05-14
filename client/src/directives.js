@@ -17,6 +17,7 @@ window.angular.module('webless.directives', [])
         };
     }]).directive('ngcScrolltop', function ($timeout) { 'use strict';
         return {
+            // TODO: Unbind scrollbar watch on mousedown
             link : function (scope, element, attrs) {
                 scope.$watch(attrs.ngcScrolltop, function (scroll) {
                     // console.log(element.parent());
