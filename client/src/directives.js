@@ -17,7 +17,6 @@ window.angular.module('webless.directives', [])
         };
     }]).directive('ngcScrolltop', function ($timeout) { 'use strict';
         return {
-            priority: 0,
             link : function (scope, element, attrs) {
                 scope.$watch(attrs.ngcScrolltop, function (scroll) {
                     // console.log(element.parent());

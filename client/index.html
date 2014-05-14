@@ -21,11 +21,9 @@
     <label><input type="checkbox" ng-model="showVicinity"/>Vicinity</label>
     <label><input type="checkbox" ng-model="showScrollbar"/>Scroll</label>
 
-    <!--span id="width-test" class="width-test">a</span-->
 
-    <div class="log-header" drag>testlog.log</div>
     <div class="log-container" ngc-wheelmove="wheelMoved($event)" tabindex="0">
-        <!--ng-style="{height: lineWrappedSizes[$index] * lineHeight}"-->
+        <div class="log-header" drag>{{fileName}}</div>
         <div ngc-scrolltop="scrollTop()" ng-style="viewStyle()" class="lines-view">
             <div ng-repeat="line in lines track by line.position" >
                 <div ng-if="showSelect" class="select-column"></div>
@@ -33,10 +31,11 @@
             </div>
         </div>
 
-        <!--<pre>{{scrollText}}</pre>-->
-        <div ng-if="showVicinity" id="scroll-panel" class="scroll-panel">
-            <div ng-class="{'bg-blue':$index===viewUnwrappedScroll() || $index=== viewUnwrappedEnd()}"
-                 ng-repeat="line in lines track by line.position">{{line.line}}</div>
+        <div ng-if="showVicinity" id="vicinity-panel" class="vicinity-panel">
+            <div class="vicinity-scroll" ng-style="vicinityScrollStyle()"></div>
+            <pre>{{scrollText}}</pre>
+            <!--<div ng-class="{'bg-blue':$index===viewUnwrappedScroll() || $index=== viewUnwrappedEnd()}"-->
+                 <!--ng-repeat="line in lines track by line.position">{{line.line}}</div>-->
         </div>
 
         <div ng-if="showScrollbar" ngc-syncscroll="scrollTo($fraction)" id="scroll-bar" class="scroll-bar" ngc-scrolltop="scrollbarScroll()" ng-style="{height: viewHeight * lineHeight}">

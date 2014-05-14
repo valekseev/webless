@@ -17,8 +17,9 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
     $scope.viewScroll = 0;
     $scope.viewUnwrappedScroll = function() {return wrappedToLineMap[$scope.viewScroll]; };
     $scope.viewUnwrappedEnd = function() {return wrappedToLineMap[$scope.viewScroll+$scope.viewHeight-1]; };
-    $scope.cacheSize=$cache.cacheSize();
-    $scope.fileSize=$cache.fileSize();
+    $scope.cacheSize = $cache.cacheSize();
+    $scope.fileSize = $cache.fileSize();
+    $scope.fileName = 'test-server:/test-dir/test-file.log';
     $scope.pullThreshold = 0.15;
 
     $scope.showSelect = true;
@@ -48,10 +49,17 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.viewStyle = function () {
         return {
-            'height' : $scope.viewHeight * $scope.lineHeight,
-            'width' : $scope.viewWidth * $scope.letterWidth + 21,
+            'height': $scope.viewHeight * $scope.lineHeight,
+            'width': $scope.viewWidth * $scope.letterWidth + 21,
             'font-size': $scope.letterHeight  + 'px',
-            'white-space' : $scope.isWrapped ? 'normal' : 'nowrap'
+            'white-space': $scope.isWrapped ? 'normal' : 'nowrap'
+        };
+    };
+
+    $scope.vicinityScrollStyle = function () {
+        return {
+            'top': $scope.viewUnwrappedScroll() * 3,
+            'height': ($scope.viewUnwrappedEnd() - $scope.viewUnwrappedScroll() + 2) * 3
         };
     };
 
@@ -123,9 +131,9 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
     function prepareScroll() {
         var i,l;
         var reg = new RegExp('\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d ');
-        $scope.scrollText=[];
+        $scope.scrollText='';
         for (i=0, l=$scope.lines.length; i<l; i++) {
-            $scope.scrollText.push($scope.lines[i].line.replace(reg,''));
+            $scope.scrollText+=$scope.lines[i].line.replace(reg,'') + '\n';
         }
 //        console.log($scope.scrollText);
     }
@@ -149,7 +157,7 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
             } while ((wrappedPos += wrappingLength) < line.length && $scope.isWrapped);
             $scope.lineWrappedSizes[i] = wrappedSize;
         }
-//        prepareScroll();
+        prepareScroll();
     }
 
     $scope.keyPressed = function(e) {

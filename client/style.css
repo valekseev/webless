@@ -1,51 +1,20 @@
-.log-container2 {
-    height:400px;
-    width:400px;
-}
-
 .log-header {
+    text-align: center;
+    background-color: lightgrey;
+    font-weight: bold;
 }
 
 .log-container {
-    /*font-size:13px;*/
-    /*font-family:courier, "courier new", monospace;*/
     font-family: "Courier New",Courier, mono, serif;
     float: left;
-}
-
-.width-test {
-    /*font-size:13px;*/
-    /*font-family:courier, "courier new", monospace;*/
-    font-family: "Courier New",Courier, mono, serif;
-    font-size:13px;
-    /*height:auto;*/
-    /*width:auto;*/
 }
 
 .lines-view {
     overflow: hidden;
     word-break:break-all;
-    /*white-space:nowrap;*/
-    /*font-size:15px;*/
-    /*font-family:courier, "courier new", monospace;*/
-    /*resize: both;*/
     border: 1px solid black;
     float:left;
     line-height: 15px;
-}
-
-.scroll-panel {
-    white-space: nowrap;
-    overflow: hidden;
-    word-break:break-all;
-    width:250px;
-    font-size:3px;
-    line-height: 3px;
-    /*white-space:nowrap;*/
-    /*font-family:courier, "courier new", monospace;*/
-    /*resize: both;*/
-    /*border: 1px solid black;*/
-    float:left;
 }
 
 .select-column {
@@ -64,6 +33,25 @@
     word-break:break-all;
 }
 
+.vicinity-panel {
+    white-space: nowrap;
+    overflow: hidden;
+    word-break:break-all;
+    width:250px;
+    font-size:3px;
+    line-height: 3px;
+    float:left;
+    position: relative;
+}
+
+.vicinity-scroll {
+    opacity: 0.3;
+    background-color: yellow;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+}
+
 .scroll-bar {
     overflow-y: scroll;
     height:100%;
@@ -72,13 +60,5 @@
 
 .scroll-spacer {
     height:500%;
-}
-
-.bg-blue {
-    background-color: blue;
-}
-
-.bg-grey {
-    background-color: grey;
 }
 
