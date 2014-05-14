@@ -1,7 +1,7 @@
 ﻿(function(angular, console, undefined) {'use strict';
 
 angular.module('webless.controllers', []).controller('ViewController', [ '$scope', '$cache', function($scope, $cache) {
-    $scope.viewHeight = 40;
+    $scope.viewHeight = 30;
     $scope.viewWidth = 110;
 
     $scope.lineHeight = 15;
@@ -35,7 +35,7 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.lines = $cache.retrieveFrom($scope.fileSize, -$scope.viewHeight);
     recalculateWrappedMap();
-    lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - 1 - $scope.viewHeight]].position;
+    lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - $scope.viewHeight]].position;
 
     $scope.lines = $cache.retrieveFrom($scope.firstStart, bufferedLines());
     recalculateWrappedMap();
@@ -194,20 +194,17 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
     }
 
     $scope.scrollbarScroll = function() {
-//        var line = $scope.lines[$scope.viewUnwrappedEnd()];
-//        return Math.round((line.position + line.line.length - firstScreenEnd) /
-//            ($scope.fileSize - firstScreenEnd) * $scope.viewHeight * $scope.lineHeight * $scope.pagesBuffer * 2);
         var line = $scope.lines[$scope.viewUnwrappedScroll()];
         return Math.round(line.position / lastScreenStart * $scope.viewHeight * $scope.lineHeight * $scope.pagesBuffer * 2);
     };
 
     $scope.scrollTo = function (fraction) {
-        var pos = Math.round($scope.fileSize * fraction);
+        var pos = Math.round(lastScreenStart * fraction);
 
-//        var newData = $cache.retrieveAllLines(pos, bufferedLines(), $scope.pagesBuffer * $scope.viewHeight);
-//        $scope.lines = newData.lines;
-//        recalculateWrappedMap();
-//        $scope.viewScroll = Math.min(wrappedToLineMap.length-$scope.viewHeight-1, lineToWrappedMap[newData.scroll]);
+        var newData = $cache.retrieveAllLines(pos, bufferedLines(), $scope.pagesBuffer * $scope.viewHeight);
+        $scope.lines = newData.lines;
+        recalculateWrappedMap();
+        $scope.viewScroll = Math.min(wrappedToLineMap.length-$scope.viewHeight, lineToWrappedMap[newData.scroll]);
     };
 }]);
 

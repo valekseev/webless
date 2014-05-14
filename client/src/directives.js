@@ -24,7 +24,7 @@ window.angular.module('webless.directives', [])
                         if (element[0].scrollHeight <= scroll) {
                             $timeout(function() {
                                 element[0].scrollTop = scroll;
-                            });                                
+                            });
                         } else {
                             element[0].scrollTop = scroll;
                         }
@@ -38,12 +38,17 @@ window.angular.module('webless.directives', [])
             compile : function($element, attr) {
                 var fn = $parse(attr.ngcSyncscroll);
                 return function(scope, element, attr) {
-                    element.on('scroll', function(event) {
-                        scope.$apply(function() {
-                            fn(scope, {
-                                $fraction : element.prop('scrollTop') / (element.prop('scrollHeight') - element.prop('offsetHeight'))
+                    element.on('mousedown', function (){
+                        element.on('scroll', function(event) {
+                            scope.$apply(function() {
+                                fn(scope, {
+                                    $fraction : element.prop('scrollTop') / (element.prop('scrollHeight') - element.prop('offsetHeight'))
+                                });
                             });
                         });
+                    });
+                    element.on('mouseup', function (){
+                        element.off('scroll');
                     });
                 };
             }

@@ -13,12 +13,12 @@ angular.module('webless.services', []).service('$cache', function() {
         var lines = [];
         var actualScroll;
         if (positionFrom<0 || positionFrom > this.fileSize()) { return lines; }
-        lines = this.retrieveFrom(positionFrom, -scroll - 1, true);
+        lines = this.retrieveFrom(positionFrom, -scroll, true);
         actualScroll = lines.length;
         lines = lines.concat(this.retrieveFrom(positionFrom, linesNumber - lines.length));
         if (lines.length<linesNumber){
-            actualScroll+=linesNumber - lines.length-1;
-            lines = this.retrieveFrom(lines[0].position, linesNumber - lines.length, true).concat(lines);
+            actualScroll+=linesNumber - lines.length;
+            lines = this.retrieveFrom(lines[0].position, lines.length - linesNumber , true).concat(lines);
         }
         return {
             lines : lines,
