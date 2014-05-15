@@ -13,17 +13,17 @@
 <div ng-keydown="keyPressed($event)">
     <div>len: {{lines.length}} viewStart: {{lines[0].position}} viewScroll: {{viewScroll}} ({{viewUnwrappedScroll()}}) | cached: {{cacheSize}} fileSize: {{fileSize}} | {{viewStyle()}} </div>
     <input type="button" ng-click="moveView(1)" value="down"/>
-    <input type="number" ng-model="viewHeight"/>
-    <input type="number" ng-model="viewWidth"/>
+    <input type="number" ng-model="viewHeight" ng-change="updateViewSize()"/>
+    <input type="number" ng-model="viewWidth" ng-change="updateViewSize()"/>
     <label><input type="checkbox" ng-model="isWrapped"/>Wrap</label>
-    Hide:
+     | Hide:
     <label><input type="checkbox" ng-model="showSelect"/>Select</label>
     <label><input type="checkbox" ng-model="showVicinity"/>Vicinity</label>
     <label><input type="checkbox" ng-model="showScrollbar"/>Scroll</label>
 
 
     <div class="log-container" ngc-wheelmove="wheelMoved($event)" tabindex="0">
-        <div class="log-header" drag>{{fileName}}</div>
+        <div class="log-header" drag><input id="log-name" type="text" ng-model="fileName"/> <input type="button" ng-click="init()" value="Load"/></div>
         <div ngc-scrolltop="scrollTop()" ng-style="viewStyle()" class="lines-view">
             <div ng-repeat="line in lines track by line.position" >
                 <div ng-if="showSelect" class="select-column"></div>
@@ -40,6 +40,7 @@
             <div id="scroll-spacer" class="scroll-spacer"></div>
         </div>
     </div>
+    <div id="data">Data: {{httpData}}</div>
 </div>
 </body>
 </html>

@@ -1,6 +1,7 @@
 ﻿(function(angular, console, undefined) {'use strict';
 
 angular.module('webless.controllers', []).controller('ViewController', [ '$scope', '$cache', function($scope, $cache) {
+    $scope.httpData = $cache.httpData();
     $scope.viewHeight = 30;
     $scope.viewWidth = 110;
 
@@ -19,7 +20,7 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
     $scope.viewUnwrappedEnd = function() {return wrappedToLineMap[$scope.viewScroll+$scope.viewHeight-1]; };
     $scope.cacheSize = $cache.cacheSize();
     $scope.fileSize = $cache.fileSize();
-    $scope.fileName = 'test-server:/test-dir/test-file.log';
+    $scope.fileName = 'http://localhost:63342/webless/client/filename.txt';
     $scope.pullThreshold = 0.15;
 
     $scope.showSelect = true;
@@ -36,12 +37,19 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
 
     $scope.lines = $cache.retrieveFrom($scope.fileSize, -$scope.viewHeight);
     recalculateWrappedMap();
-    lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - $scope.viewHeight]].position;
+    if ($scope.lines.length > 0) {
+        lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - $scope.viewHeight]].position;
+    }
 
     $scope.lines = $cache.retrieveFrom($scope.firstStart, bufferedLines());
-    recalculateWrappedMap();
-    firstScreenEnd = $scope.lines[$scope.viewUnwrappedEnd()].position + $scope.lines[$scope.viewUnwrappedEnd()].line.length;
+    if ($scope.lines.length > 0) {
+        recalculateWrappedMap();
+        firstScreenEnd = $scope.lines[$scope.viewUnwrappedEnd()].position + $scope.lines[$scope.viewUnwrappedEnd()].line.length;
+    }
 
+    function init(){
+        $cache.init($scope.fileName);
+    }
 
     function bufferedLines() {
         return ($scope.pagesBuffer * 2 + 1) * $scope.viewHeight;
@@ -67,15 +75,25 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
         return $scope.viewScroll * $scope.lineHeight;
     };
 
+    $scope.scrollbarScroll = function() {
+        var line = $scope.lines[$scope.viewUnwrappedScroll()];
+        if (line && lastScreenStart) {
+            return Math.round(line.position / lastScreenStart * $scope.viewHeight * $scope.lineHeight * $scope.pagesBuffer * 2);
+        }
+    };
+
+    $scope.updateViewSize = function (){
+        var diff = $scope.lines.length - bufferedLines();
+        if (diff > 0) {
+            $scope.lines = $scope.lines.concat($cache.retrieveFrom($scope.lines[$scope.lines.length-1].position, diff));
+        } else if (diff < 0) {
+            $scope.lines = $scope.lines.slice(0, bufferedLines());
+        }
+        recalculateWrappedMap();
+    };
+
     // Validates new position(wrapped) and requests new lines from cache if needed
     $scope.moveView = function (shift) {
-        if ($scope.lines.length !== bufferedLines()) {
-            $scope.lines = $cache.retrieveFrom($scope.lines[0].position, bufferedLines());
-            recalculateWrappedMap();
-        } else if (wrappingLength !== $scope.viewWidth) {
-            recalculateWrappedMap();
-        }
-
         var newWrappedStart = $scope.viewScroll + shift;
         var wrappedLength = wrappedToLineMap.length;
 
@@ -184,11 +202,6 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
         } else {
             $scope.moveView(-1);
         }
-    };
-
-    $scope.scrollbarScroll = function() {
-        var line = $scope.lines[$scope.viewUnwrappedScroll()];
-        return Math.round(line.position / lastScreenStart * $scope.viewHeight * $scope.lineHeight * $scope.pagesBuffer * 2);
     };
 
     $scope.scrollTo = function (fraction) {

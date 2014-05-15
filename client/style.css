@@ -2,6 +2,15 @@
     text-align: center;
     background-color: lightgrey;
     font-weight: bold;
+    height: 20px;
+}
+.log-header input {
+    height: 20px;
+    margin: 0px;
+}
+
+#log-name {
+    width: 500px;
 }
 
 .log-container {
@@ -44,7 +53,7 @@
 }
 
 .vicinity-panel pre {
-    font-family: 'Lucida Console';
+    font-family: 'Lucida Console', Courier, serif
 }
 
 .vicinity-scroll {
@@ -63,5 +72,9 @@
 
 .scroll-spacer {
     height:500%;
+}
+
+#data {
+    clear: both;
 }
 
