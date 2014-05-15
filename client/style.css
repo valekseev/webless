@@ -5,7 +5,6 @@
 }
 
 .log-container {
-    font-family: "Courier New",Courier, mono, serif;
     float: left;
 }
 
@@ -15,6 +14,7 @@
     border: 1px solid black;
     float:left;
     line-height: 15px;
+    font-family: 'Courier New',Courier, mono, serif;
 }
 
 .select-column {
@@ -34,14 +34,17 @@
 }
 
 .vicinity-panel {
+    width:200px;
     white-space: nowrap;
     overflow: hidden;
-    word-break:break-all;
-    width:250px;
     font-size:3px;
     line-height: 3px;
     float:left;
     position: relative;
+}
+
+.vicinity-panel pre {
+    font-family: 'Lucida Console';
 }
 
 .vicinity-scroll {
