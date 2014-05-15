@@ -34,8 +34,6 @@
         <div ng-if="showVicinity" id="vicinity-panel" class="vicinity-panel">
             <div class="vicinity-scroll" ng-style="vicinityScrollStyle()"></div>
             <pre>{{scrollText}}</pre>
-            <!--<div ng-class="{'bg-blue':$index===viewUnwrappedScroll() || $index=== viewUnwrappedEnd()}"-->
-                 <!--ng-repeat="line in lines track by line.position">{{line.line}}</div>-->
         </div>
 
         <div ng-if="showScrollbar" ngc-syncscroll="scrollTo($fraction)" id="scroll-bar" class="scroll-bar" ngc-scrolltop="scrollbarScroll()" ng-style="{height: viewHeight * lineHeight}">
