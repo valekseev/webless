@@ -1,7 +1,6 @@
 ﻿(function(angular, console, undefined) {'use strict';
 
-angular.module('webless.controllers', []).controller('ViewController', [ '$scope', '$cache', function($scope, $cache) {
-    $scope.httpData = $cache.httpData();
+angular.module('webless.controllers', []).controller('ViewController', function($scope, $cache, $fetcher) {
     $scope.viewHeight = 30;
     $scope.viewWidth = 110;
 
@@ -19,7 +18,7 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
     $scope.viewUnwrappedScroll = function() {return wrappedToLineMap[$scope.viewScroll]; };
     $scope.viewUnwrappedEnd = function() {return wrappedToLineMap[$scope.viewScroll+$scope.viewHeight-1]; };
     $scope.cacheSize = $cache.cacheSize();
-    $scope.fileSize = $cache.fileSize();
+    $scope.fileSize = $fetcher.fileSize();
     $scope.fileName = 'http://localhost:63342/webless/client/filename.txt';
     $scope.pullThreshold = 0.15;
 
@@ -27,6 +26,9 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
     $scope.showVicinity = true;
     $scope.showScrollbar = true;
 
+    $scope.httpData = function() {
+        return $fetcher.httpData();
+    };
 
     var wrappingLength;
     var wrappedToLineMap;
@@ -47,9 +49,10 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
         firstScreenEnd = $scope.lines[$scope.viewUnwrappedEnd()].position + $scope.lines[$scope.viewUnwrappedEnd()].line.length;
     }
 
-    function init(){
+    $scope.init = function (){
         $cache.init($scope.fileName);
-    }
+        $scope.lines = $cache.retrieveFrom($scope.firstStart, bufferedLines());
+    };
 
     function bufferedLines() {
         return ($scope.pagesBuffer * 2 + 1) * $scope.viewHeight;
@@ -212,6 +215,6 @@ angular.module('webless.controllers', []).controller('ViewController', [ '$scope
         recalculateWrappedMap();
         $scope.viewScroll = Math.min(wrappedToLineMap.length-$scope.viewHeight, lineToWrappedMap[newData.scroll]);
     };
-}]);
+});
 
 })(window.angular, window.console);

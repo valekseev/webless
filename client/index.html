@@ -23,7 +23,9 @@
 
 
     <div class="log-container" ngc-wheelmove="wheelMoved($event)" tabindex="0">
-        <div class="log-header" drag><input id="log-name" type="text" ng-model="fileName"/> <input type="button" ng-click="init()" value="Load"/></div>
+        <div class="log-header" drag>
+            <input id="log-name" type="text" ng-model="fileName"/>
+            <input type="button" ng-click="init()" value="Load"/></div>
         <div ngc-scrolltop="scrollTop()" ng-style="viewStyle()" class="lines-view">
             <div ng-repeat="line in lines track by line.position" >
                 <div ng-if="showSelect" class="select-column"></div>
@@ -40,7 +42,7 @@
             <div id="scroll-spacer" class="scroll-spacer"></div>
         </div>
     </div>
-    <div id="data">Data: {{httpData}}</div>
+    <div id="data">Data: {{httpData()}}</div>
 </div>
 </body>
 </html>
