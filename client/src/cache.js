@@ -86,7 +86,10 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var entry = cache[position];
         var startFrom=0;
         if (entry === undefined) {
-            position = positions[bs.closest(positions, position)];
+            var closestPosition = positions[bs.closest(positions, position)];
+            if (closestPosition!==undefined) {
+                position = closestPosition;
+            }
             entry = cache[position];
             if (entry!==undefined) {
                 var nextEntry = cache[entry.next];
@@ -101,6 +104,10 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         if (isSkipFirst===true) {
             absNumber++;
             startFrom = 1;
+            if (entry!==undefined) {
+                position = isPositive ? entry.next : entry.prev;
+                entry = cache[position];
+            }
         }
 
         for (i=startFrom; i<absNumber; i++) {
@@ -121,6 +128,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     };
 
     function fetchAndWrap(position, linesNumber) {
+        var deferred = [];
         var results = [];
         var fetchedPromise;
         var linePos = 0;
@@ -128,8 +136,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
 
         var absNumber = Math.abs(linesNumber);
         for (var i= 0; i<absNumber; i++) {
-            results.push({position: position+i,
-                          line: $q.defer()});
+            deferred.push($q.defer());
         }
 
         if (linesNumber < 0) {
@@ -138,10 +145,10 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
             fetchedPromise = $fetcher.fetch(position, position + chunk);
         }
         fetchedPromise.then(function(lines){
-            for (var i= 0,l=lines.length;i<l;i++) {
+            for (var i = 0, l = lines.length; i < l; i++) {
                 var line = lines[i];
                 if (i<linesNumber || i>l+linesNumber) {
-                    results[i].line.resolve(line);
+                    deferred[i].resolve(line.line);
                 }
                 var lineLength = line.length + 1;
                 cache[linePos] = {line : line, next : linePos+lineLength, prev : prev};
@@ -150,6 +157,11 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
                 linePos+= lineLength;
             }
         });
+
+        for (i = 0; i<absNumber; i++) {
+            results.push({position: -i-1,
+                          line: deferred[i].promise});
+        }
         return results;
     }
 

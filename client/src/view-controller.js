@@ -37,13 +37,39 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     var firstScreenEnd;
     var lastScreenStart;
 
-    $scope.lines = $cache.retrieveFrom($scope.fileSize, -$scope.viewHeight);
+    function search(position) {
+        for (var i=0, l=$scope.lines.length;i<l;i++) {
+            if (position===$scope.lines[i].position){
+                return i;
+            }
+        }
+    }
+
+    function retrieve(positionFrom, lines, skipFirst) {
+        var newLines = $cache.retrieveFrom(positionFrom, lines, skipFirst);
+        var results = [];
+        for (var i= 0,l=newLines.length; i<l; i++) {
+            if (newLines[i].position<0) {
+                results.push({position:newLines[i].position,line:"Waiting"});
+                (function (position){
+                    newLines[i].line.then(function(entry){
+                        $scope.lines[search(position)] = entry;
+                    });
+                })(newLines[i].position);
+            } else {
+                results.push(newLines[i]);
+            }
+        }
+        return results;
+    }
+
+    $scope.lines = retrieve($scope.fileSize, -$scope.viewHeight);
     recalculateWrappedMap();
     if ($scope.lines.length > 0) {
         lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - $scope.viewHeight]].position;
     }
 
-    $scope.lines = $cache.retrieveFrom($scope.firstStart, bufferedLines());
+    $scope.lines = retrieve($scope.firstStart, bufferedLines());
     if ($scope.lines.length > 0) {
         recalculateWrappedMap();
         firstScreenEnd = $scope.lines[$scope.viewUnwrappedEnd()].position + $scope.lines[$scope.viewUnwrappedEnd()].line.length;
@@ -51,7 +77,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
 
     $scope.init = function (){
         $cache.init($scope.fileName);
-        $scope.lines = $cache.retrieveFrom($scope.firstStart, bufferedLines());
+        $scope.lines = retrieve($scope.firstStart, bufferedLines());
     };
 
     function bufferedLines() {
@@ -88,7 +114,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     $scope.updateViewSize = function (){
         var diff = $scope.lines.length - bufferedLines();
         if (diff > 0) {
-            $scope.lines = $scope.lines.concat($cache.retrieveFrom($scope.lines[$scope.lines.length-1].position, diff));
+            $scope.lines = $scope.lines.concat(retrieve($scope.lines[$scope.lines.length-1].position, diff));
         } else if (diff < 0) {
             $scope.lines = $scope.lines.slice(0, bufferedLines());
         }
@@ -122,7 +148,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
             slide -= Math.round($scope.viewHeight * (1 - $scope.lines.length/wrappedToLineMap.length) / 2);
         }
 
-        var newData = $cache.retrieveFrom($scope.lines[0].position, slide, true);
+        var newData = retrieve($scope.lines[0].position, slide, true);
         if (newData.length === 0) { return; }
         $scope.lines = newData.concat($scope.lines).slice(0, bufferedLines());
         recalculateWrappedMap();
@@ -137,7 +163,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
             slide -= Math.round($scope.viewHeight * (1 - $scope.lines.length/wrappedToLineMap.length) / 2);
         }
 
-        var newData = $cache.retrieveFrom($scope.lines[$scope.lines.length -1].position, slide, true);
+        var newData = retrieve($scope.lines[$scope.lines.length -1].position, slide, true);
         var realSlide = newData.length;
         if (realSlide === 0) { return; }
         $scope.lines = $scope.lines.concat(newData).slice(realSlide);
