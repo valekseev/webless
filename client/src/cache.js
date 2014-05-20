@@ -64,7 +64,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     };
 
     this.retrieveAllLines = function(positionFrom, linesNumber, scroll) {
-        var lines = [];
+        var lines;
         var actualScroll;
         lines = this.retrieveFrom(positionFrom, -scroll, true);
         actualScroll = lines.length;
@@ -131,7 +131,6 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var deferred = [];
         var results = [];
         var fetchedPromise;
-        var linePos = 0;
         var prev;
 
         var absNumber = Math.abs(linesNumber);
@@ -144,17 +143,16 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         } else {
             fetchedPromise = $fetcher.fetch(position, position + chunk);
         }
-        fetchedPromise.then(function(lines){
-            for (var i = 0, l = lines.length; i < l; i++) {
-                var line = lines[i];
+        fetchedPromise.then(function(entries){
+            for (var i = 0, l = entries.length; i < l; i++) {
+                var entry = entries[i];
                 if (i<linesNumber || i>l+linesNumber) {
-                    deferred[i].resolve(line.line);
+                    deferred[i].resolve(entry);
                 }
-                var lineLength = line.length + 1;
-                cache[linePos] = {line : line, next : linePos+lineLength, prev : prev};
-                positions.push(linePos);
-                prev=linePos;
-                linePos+= lineLength;
+                var lineLength = entry.length + 1;
+                cache[entry.position] = {line : entry.line, next : entry.position+entry.line.length+1, prev : prev};
+                positions.push(entry.position);
+                prev=entry.position;
             }
         });
 

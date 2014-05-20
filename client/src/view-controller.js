@@ -17,9 +17,9 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     $scope.viewScroll = 0;
     $scope.viewUnwrappedScroll = function() {return wrappedToLineMap[$scope.viewScroll]; };
     $scope.viewUnwrappedEnd = function() {return wrappedToLineMap[$scope.viewScroll+$scope.viewHeight-1]; };
-    $scope.cacheSize = $cache.cacheSize();
-    $scope.fileSize = $fetcher.fileSize();
-    $scope.fileName = 'http://localhost:63342/webless/client/filename.txt';
+    $scope.cacheSize = function() {return $cache.cacheSize();};
+    $scope.fileSize = function() {return $fetcher.fileSize();};
+    $scope.fileName = 'filename.txt';
     $scope.pullThreshold = 0.15;
 
     $scope.showSelect = true;
@@ -45,17 +45,20 @@ angular.module('webless.controllers', []).controller('ViewController', function(
         }
     }
 
+    function updateAsync(promise, replacePosition){
+        promise.then(function(entry){
+            $scope.lines[search(replacePosition)] = entry;
+            recalculateWrappedMap();
+        });
+    }
+
     function retrieve(positionFrom, lines, skipFirst) {
         var newLines = $cache.retrieveFrom(positionFrom, lines, skipFirst);
         var results = [];
         for (var i= 0,l=newLines.length; i<l; i++) {
             if (newLines[i].position<0) {
                 results.push({position:newLines[i].position,line:"Waiting"});
-                (function (position){
-                    newLines[i].line.then(function(entry){
-                        $scope.lines[search(position)] = entry;
-                    });
-                })(newLines[i].position);
+                updateAsync(newLines[i].line, newLines[i].position);
             } else {
                 results.push(newLines[i]);
             }

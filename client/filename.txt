@@ -1,4 +1,4 @@
-2013-11-26 00:57:36.239 [Producer] [Consumer.java:112] sunt magna est amet, irure mollit cupidatat occaecat tempor commodo
+2013-11-26 00:57:36.239 !START!!!!!!!!!!!!!!!!!!
 2013-11-26 00:57:36.290 [Thread-2] [Producer.java:111] non Excepteur Lorem qui eu ut amet,
 2013-11-26 00:57:36.316 [Thread-3] [Timer.java:555] proident, dolore non qui Lorem exercitation sit veniam,
 2013-11-26 00:57:36.464 [Producer] [Timer.java:555] amet, ipsum fugiat amet, tempor fugiat
@@ -2170,4 +2170,4 @@
 2013-11-26 01:01:15.306 [Consumer] [Producer.java:111] reprehenderit ex aliqua. ipsum irure exercitation eiusmod eiusmod
 2013-11-26 01:01:15.311 [Producer] [Timer.java:555] in fugiat mollit dolor ipsum in non nisi veniam, qui
 2013-11-26 01:01:15.394 [Thread-2] [Consumer.java:112] consectetur adipisicing commodo adipisicing id eu esse ad est aute anim proident,
-2013-11-26 01:01:15.570 [Consumer] [Consumer.java:112] sit aliquip ullamco occaecat Lorem pariatur. aute dolor enim magna
+2013-11-26 01:01:15.570 !END!!!!!!!!!!!!!!!!!!!!!!!!
