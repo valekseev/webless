@@ -29,7 +29,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
 
     this.fetch = function(from, to) {
         var deferred = $q.defer();
-        $http({method:'GET', url: url, headers: {Range: 'bytes=' + from + '-' + to}})
+        $http({method:'GET', url: url, headers: {'Range': 'bytes=' + from + '-' + to}})
             .success(function (data, status, headers) {
                 fileSize = headers('Content-Length');
                 lastData = data;
@@ -85,6 +85,8 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var position = positionFrom;
         var entry = cache[position];
         var startFrom=0;
+        var fetched={};
+
         if (entry === undefined) {
             var closestPosition = positions[bs.closest(positions, position)];
             if (closestPosition!==undefined) {
@@ -113,8 +115,10 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         for (i=startFrom; i<absNumber; i++) {
             if (entry===undefined) {
                 if ($fetcher.isInit()){
-                    lines = lines.concat(fetchAndWrap(position, isPositive? absNumber-i : i-absNumber));
+                    fetched = fetchAndCache(position, isPositive? absNumber-i : i-absNumber);
+                    lines = lines.concat(fetched.lines);
                 }
+                //TODO: handle isInit false
                 break;
             }
             lines.push({position: position, line: entry.line});
@@ -124,43 +128,47 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         if (!isPositive) {
             lines=lines.reverse();
         }
-        return lines;
+        return {lines:lines, promise:fetched.promise};
     };
 
-    function fetchAndWrap(position, linesNumber) {
-        var deferred = [];
-        var results = [];
+    function fetchAndCache(position, linesNumber) {
+        var deferred = $q.defer();
         var fetchedPromise;
         var prev;
+        var isPositive=true;
+        var lines=[];
 
         var absNumber = Math.abs(linesNumber);
-        for (var i= 0; i<absNumber; i++) {
-            deferred.push($q.defer());
-        }
 
         if (linesNumber < 0) {
+            isPositive=false;
             fetchedPromise = $fetcher.fetch(Math.max(position-chunk, 0), position);
         } else {
             fetchedPromise = $fetcher.fetch(position, position + chunk);
         }
         fetchedPromise.then(function(entries){
+            // Adding all fetched values to cache
+            var count=0;
+            var results=[];
             for (var i = 0, l = entries.length; i < l; i++) {
                 var entry = entries[i];
                 if (i<linesNumber || i>l+linesNumber) {
-                    deferred[i].resolve(entry);
+                    results.push({placeholder:position +isPositive?'+':'-'+count, line:entry});
+                    count++;
                 }
                 var lineLength = entry.length + 1;
                 cache[entry.position] = {line : entry.line, next : entry.position+entry.line.length+1, prev : prev};
                 positions.push(entry.position);
                 prev=entry.position;
             }
+            deferred.resolve(results);
         });
 
-        for (i = 0; i<absNumber; i++) {
-            results.push({position: -i-1,
-                          line: deferred[i].promise});
+        for (var i = 0; i<absNumber; i++) {
+            lines.push({position: position +isPositive?'+':'-' + i, line: 'Waiting'});
         }
-        return results;
+
+       return {lines:lines,promise:deferred.promise};
     }
 
     this.cacheSize = function () {
