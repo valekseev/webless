@@ -7,6 +7,7 @@
   },
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-contrib-connect": "~0.7.1"
+    "grunt-contrib-connect": "~0.7.1",
+    "grunt-throttle": "git://github.com/tjgq/grunt-throttle#latency"
   }
 }
