@@ -55,7 +55,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     var cache={};
     var positions = [];
     var bs = require('binarysearch');
-    var chunk=10000; //10KB
+    var chunk=50000;
 
     this.init = function(url){
         cache={};
@@ -63,19 +63,28 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         $fetcher.init(url);
     };
 
+    //TODO: replace with one retrieveFrom call
     this.retrieveAllLines = function(positionFrom, linesNumber, scroll) {
-        var lines;
         var actualScroll;
-        lines = this.retrieveFrom(positionFrom, -scroll, true);
+        var promises = [];
+        var entries = this.retrieveFrom(positionFrom, -scroll, true);
+        var lines = entries.lines;
+
+        promises.push(entries.promise);
         actualScroll = lines.length;
-        lines = lines.concat(this.retrieveFrom(positionFrom, linesNumber - lines.length));
+        entries = this.retrieveFrom(positionFrom, linesNumber - lines.length )
+        lines = lines.concat(entries.lines);
+        promises.push(entries.promise);
         if (lines.length<linesNumber && lines.length > 0){
+            entries = this.retrieveFrom(lines[0].position, lines.length - linesNumber , true);
+            lines = entries.lines.concat(lines);
+            promises.push(entries.promise);
             actualScroll+=linesNumber - lines.length;
-            lines = this.retrieveFrom(lines[0].position, lines.length - linesNumber , true).concat(lines);
         }
         return {
-            lines : lines,
-            scroll : actualScroll
+            lines    : lines,
+            scroll   : actualScroll,
+            promises : promises
         };
     };
 
@@ -153,7 +162,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
             for (var i = 0, l = entries.length; i < l; i++) {
                 var entry = entries[i];
                 if (i<linesNumber || i>l+linesNumber) {
-                    results.push({placeholder:position +isPositive?'+':'-'+count, line:entry});
+                    results.push({placeHolder:position + (isPositive?'+':'-') + count, line:entry});
                     count++;
                 }
                 var lineLength = entry.length + 1;
@@ -165,7 +174,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         });
 
         for (var i = 0; i<absNumber; i++) {
-            lines.push({position: position +isPositive?'+':'-' + i, line: 'Waiting'});
+            lines.push({position: position + (isPositive?'+':'-') + i, line: 'Waiting'});
         }
 
        return {lines:lines,promise:deferred.promise};

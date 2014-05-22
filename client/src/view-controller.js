@@ -37,23 +37,39 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     var firstScreenEnd;
     var lastScreenStart;
 
+    //TODO: replace $scope.lines with array-backed map class
     function search(position) {
         for (var i=0, l=$scope.lines.length;i<l;i++) {
             if (position===$scope.lines[i].position){
                 return i;
             }
         }
+        return -1;
     }
 
-    function updateAsync(promise, replacePosition){
-        promise.then(function(entry){
-            $scope.lines[search(replacePosition)] = entry;
+    function processPromise(promise){
+        promise.then(function(entries) {
+            var entry;
+            var pos;
+            for (var i = 0, l=entries.length;i<l;i++) {
+                entry = entries[i];
+                pos = search(entry.placeHolder);
+                if (pos!==-1) {
+                    $scope.lines[pos] = entry.line;
+                }
+            }
             recalculateWrappedMap();
         });
     }
 
     function retrieve(positionFrom, lines, skipFirst) {
-        var newLines = $cache.retrieveFrom(positionFrom, lines, skipFirst);
+        var entry;
+        var pos;
+        var newData = $cache.retrieveFrom(positionFrom, lines, skipFirst);
+        var newLines = newData.lines;
+        if (newData.promise) {
+            processPromise(newData.promise);
+        }
         var results = [];
         for (var i= 0,l=newLines.length; i<l; i++) {
             if (newLines[i].position<0) {
@@ -240,6 +256,9 @@ angular.module('webless.controllers', []).controller('ViewController', function(
         var pos = Math.round(lastScreenStart * fraction);
 
         var newData = $cache.retrieveAllLines(pos, bufferedLines(), $scope.pagesBuffer * $scope.viewHeight);
+        for (var i=0, l=newData.promises.length; i<l; i++){
+            processPromise(newData.promises[i]);
+        }
         $scope.lines = newData.lines;
         recalculateWrappedMap();
         $scope.viewScroll = Math.min(wrappedToLineMap.length-$scope.viewHeight, lineToWrappedMap[newData.scroll]);
