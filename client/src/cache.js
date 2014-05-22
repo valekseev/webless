@@ -31,7 +31,6 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var deferred = $q.defer();
         $http({method:'GET', url: url, headers: {'Range': 'bytes=' + from + '-' + to}})
             .success(function (data, status, headers) {
-                fileSize = headers('Content-Length');
                 lastData = data;
                 deferred.resolve(parse(data,from));
             }).error(function (data, status, headers, config) {
@@ -72,7 +71,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
 
         promises.push(entries.promise);
         actualScroll = lines.length;
-        entries = this.retrieveFrom(positionFrom, linesNumber - lines.length )
+        entries = this.retrieveFrom(positionFrom, linesNumber - lines.length );
         lines = lines.concat(entries.lines);
         promises.push(entries.promise);
         if (lines.length<linesNumber && lines.length > 0){
