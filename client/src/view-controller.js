@@ -34,7 +34,6 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     var wrappedToLineMap;
     var lineToWrappedMap;
 
-    var firstScreenEnd;
     var lastScreenStart;
 
     //TODO: replace $scope.lines with array-backed map class
@@ -48,7 +47,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     }
 
     function processPromise(promise){
-        promise.then(function(entries) {
+        return promise.then(function(entries) {
             var entry;
             var pos;
             for (var i = 0, l=entries.length;i<l;i++) {
@@ -63,36 +62,20 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     }
 
     function retrieve(positionFrom, lines, skipFirst) {
-        var entry;
-        var pos;
         var newData = $cache.retrieveFrom(positionFrom, lines, skipFirst);
-        var newLines = newData.lines;
         if (newData.promise) {
             processPromise(newData.promise);
         }
-        var results = [];
-        for (var i= 0,l=newLines.length; i<l; i++) {
-            if (newLines[i].position<0) {
-                results.push({position:newLines[i].position,line:"Waiting"});
-                updateAsync(newLines[i].line, newLines[i].position);
-            } else {
-                results.push(newLines[i]);
-            }
-        }
-        return results;
+        return newData.lines;
     }
 
     $scope.lines = retrieve($scope.fileSize, -$scope.viewHeight);
-    recalculateWrappedMap();
+
     if ($scope.lines.length > 0) {
         lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - $scope.viewHeight]].position;
     }
 
     $scope.lines = retrieve($scope.firstStart, bufferedLines());
-    if ($scope.lines.length > 0) {
-        recalculateWrappedMap();
-        firstScreenEnd = $scope.lines[$scope.viewUnwrappedEnd()].position + $scope.lines[$scope.viewUnwrappedEnd()].line.length;
-    }
 
     $scope.init = function (){
         $cache.init($scope.fileName);
