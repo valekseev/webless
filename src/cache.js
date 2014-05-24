@@ -27,10 +27,28 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         return fileSize;
     };
 
+    function checkFileSize(data, headers) {
+        // Some web-servers return full length in 'Content-Range' after slash
+        var contentRange = headers('Content-Range');
+        if (contentRange) {
+            var slashPosition = contentRange.indexOf('/');
+            if (slashPosition>0) {
+                return parseInt(contentRange.substr(slashPosition+1));
+            }
+        }
+
+        // Some web-servers return full length in Content-Length of Range request
+        var contentLength = headers('Content-Length');
+        if (contentLength > data.length*2) {
+            return contentLength;
+        }
+    }
+
     this.fetch = function(from, to) {
         var deferred = $q.defer();
         $http({method:'GET', url: url, headers: {'Range': 'bytes=' + from + '-' + to}})
             .success(function (data, status, headers) {
+                fileSize = checkFileSize(data, headers);
                 lastData = data;
                 deferred.resolve(parse(data,from));
             }).error(function (data, status, headers, config) {
@@ -164,8 +182,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
                     results.push({placeHolder:position + (isPositive?'+':'-') + count, line:entry});
                     count++;
                 }
-                var lineLength = entry.length + 1;
-                cache[entry.position] = {line : entry.line, next : entry.position+entry.line.length+1, prev : prev};
+                cache[entry.position] = {line : entry.line, next : entry.position+entry.line.length, prev : prev};
                 positions.push(entry.position);
                 prev=entry.position;
             }

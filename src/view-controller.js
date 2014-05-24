@@ -25,6 +25,8 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     $scope.showSelect = true;
     $scope.showVicinity = true;
     $scope.showScrollbar = true;
+    wrappedToLineMap=[];
+    lineToWrappedMap=[];
 
     $scope.httpData = function() {
         return $fetcher.httpData();
