@@ -86,16 +86,15 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var promises = [];
         var entries = this.retrieveFrom(positionFrom, -scroll, true);
         var lines = entries.lines;
-
-        promises.push(entries.promise);
+        if (entries.promise) { promises.push(entries.promise); }
         actualScroll = lines.length;
         entries = this.retrieveFrom(positionFrom, linesNumber - lines.length );
         lines = lines.concat(entries.lines);
-        promises.push(entries.promise);
+        if (entries.promise) { promises.push(entries.promise); }
         if (lines.length<linesNumber && lines.length > 0){
             entries = this.retrieveFrom(lines[0].position, lines.length - linesNumber , true);
             lines = entries.lines.concat(lines);
-            promises.push(entries.promise);
+            if (entries.promise) { promises.push(entries.promise); }
             actualScroll+=linesNumber - lines.length;
         }
         return {
@@ -130,9 +129,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var absNumber = Math.abs(linesNumber);
 
         if (isSkipFirst===true) {
-            absNumber++;
-            startFrom = 1;
-            if (entry!==undefined) {
+            if (entry !== undefined) {
                 position = isPositive ? entry.next : entry.prev;
                 entry = cache[position];
             }
