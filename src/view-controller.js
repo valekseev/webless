@@ -71,15 +71,12 @@ angular.module('webless.controllers', []).controller('ViewController', function(
         return newData.lines;
     }
 
-    $scope.lines = retrieve($scope.fileSize, -$scope.viewHeight);
-
-    if ($scope.lines.length > 0) {
-        lastScreenStart = $scope.lines[wrappedToLineMap[wrappedToLineMap.length - $scope.viewHeight]].position;
-    }
+    $scope.lines = retrieve($scope.fileSize(), -$scope.viewHeight);
 
     $scope.lines = retrieve($scope.firstStart, bufferedLines());
 
-    $scope.init = function (){
+    $scope.init = function () {
+        $scope.viewScroll = 0;
         $cache.init($scope.fileName);
         $scope.lines = retrieve($scope.firstStart, bufferedLines());
     };
@@ -110,8 +107,8 @@ angular.module('webless.controllers', []).controller('ViewController', function(
 
     $scope.scrollbarScroll = function() {
         var line = $scope.lines[$scope.viewUnwrappedScroll()];
-        if (line && lastScreenStart) {
-            return Math.round(line.position / lastScreenStart * $scope.viewHeight * $scope.lineHeight * $scope.pagesBuffer * 2);
+        if (line) {
+            return Math.round(line.position / $scope.fileSize() * $scope.viewHeight * $scope.lineHeight * $scope.pagesBuffer * 2);
         }
     };
 
@@ -238,7 +235,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     };
 
     $scope.scrollTo = function (fraction) {
-        var pos = Math.round(lastScreenStart * fraction);
+        var pos = Math.round($scope.fileSize() * fraction);
 
         var newData = $cache.retrieveAllLines(pos, bufferedLines(), $scope.pagesBuffer * $scope.viewHeight);
         for (var i=0, l=newData.promises.length; i<l; i++){
