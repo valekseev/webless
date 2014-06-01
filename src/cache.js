@@ -70,6 +70,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     }
 }).service('$cache', function($q, $fetcher) {
     var cache={};
+    var isSorted=true;
     var positions = [];
     var bs = require('binarysearch');
     var chunk=50000;
@@ -113,13 +114,17 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var fetched={};
 
         if (entry === undefined) {
+            if (!isSorted) {
+                positions.sort();
+                isSorted=true;
+            }
             var closestPosition = positions[bs.closest(positions, position)];
             if (closestPosition!==undefined) {
                 position = closestPosition;
             }
             entry = cache[position];
             if (entry!==undefined) {
-                var nextEntry = cache[entry.next];
+                var nextEntry = entry.next;
                 if (nextEntry && nextEntry.position < positionFrom) {
                     entry = undefined;
                 }
@@ -130,8 +135,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
 
         if (isSkipFirst===true) {
             if (entry !== undefined) {
-                position = isPositive ? entry.next : entry.prev;
-                entry = cache[position];
+                entry = isPositive ? entry.next : entry.prev;
             }
         }
 
@@ -145,8 +149,8 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
                 break;
             }
             lines.push({position: position, line: entry.line});
-            position = isPositive ? entry.next : entry.prev;
-            entry = cache[position];
+            position=entry.position;
+            entry = isPositive ? entry.next : entry.prev;
         }
         if (!isPositive) {
             lines=lines.reverse();
@@ -154,10 +158,18 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         return {lines:lines, promise:fetched.promise};
     };
 
+    /**
+     * Requests some bytes from $fetcher adds all results to cache and returns
+     * lines with placeholders and a promise. Placeholders will be filled on promise resolve
+     * First or last line of request should already be cached for concatenation
+     *
+     * @param position
+     * @param linesNumber
+     * @returns {{lines: Array, promise: (*|promise)}}
+     */
     function fetchAndCache(position, linesNumber) {
         var deferred = $q.defer();
         var fetchedPromise;
-        var prev;
         var isPositive=true;
         var lines=[];
 
@@ -169,20 +181,46 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         } else {
             fetchedPromise = $fetcher.fetch(position, position + chunk);
         }
-        fetchedPromise.then(function(entries){
-            // Adding all fetched values to cache
+        fetchedPromise.then(function(fetchedEntries) {
+            isSorted=false;
             var count=0;
             var results=[];
-            for (var i = 0, l = entries.length; i < l; i++) {
-                var entry = entries[i];
-                if (i<linesNumber || i>l+linesNumber) {
-                    results.push({placeHolder:position + (isPositive?'+':'-') + count, line:entry});
+            var linkedEntry;
+            var fetchedFirst = fetchedEntries[0];
+            var firstInCache = cache[fetchedFirst.position];
+            if (firstInCache===undefined) {
+                firstInCache = {line: fetchedFirst.line, position: fetchedFirst.position};
+                cache[fetchedFirst.position] = firstInCache;
+                positions.push(fetchedFirst.position);
+            }
+            var prev = firstInCache;
+
+            for (var i = 1, l = fetchedEntries.length-1; i < l; i++) {
+                var fetchedEntry = fetchedEntries[i];
+                if (i<=linesNumber || i>=l+linesNumber) {
+                    results.push({placeHolder:position + (isPositive?'+':'-') + count, line:fetchedEntry});
                     count++;
                 }
-                cache[entry.position] = {line : entry.line, next : entry.position+entry.line.length, prev : prev};
-                positions.push(entry.position);
-                prev=entry.position;
+                linkedEntry = {line : fetchedEntry.line, position:fetchedEntry.position};
+                if (prev) {
+                    prev.next = linkedEntry;
+                    linkedEntry.prev = prev;
+                }
+                cache[fetchedEntry.position] = linkedEntry;
+                positions.push(fetchedEntry.position);
+                prev=fetchedEntry;
             }
+
+            var fetchedLast = fetchedEntries[fetchedEntries.length - 1];
+            var lastInCache = cache[fetchedLast.position];
+            if (lastInCache === undefined) {
+                lastInCache = {line: fetchedLast.line, position:fetchedLast.position};
+                cache[fetchedLast.position] = lastInCache;
+                positions.push(fetchedLast.position);
+            }
+            lastInCache.prev = linkedEntry;
+            linkedEntry.next = lastInCache;
+
             deferred.resolve(results);
         });
 
