@@ -29,7 +29,7 @@
             <input type="button" ng-click="init()" value="Load"/></div>
         <div ngc-scrolltop="scrollTop()" ng-style="viewStyle()" class="lines-view">
             <div ng-repeat="line in lines track by line.position" >
-                <div ng-if="showSelect" class="select-column"></div>
+                <div ng-if="showSelect" class="select-column">{{line.position}}</div>
                 <div class="view-column">{{line.line}}</div>
             </div>
         </div>

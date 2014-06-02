@@ -29,11 +29,11 @@
 .select-column {
     white-space: nowrap;
     overflow: hidden;
-    width: 20px;
+    width: 70px;
     float: left;
     font-size: 12px;
     min-height: 1px;
-    border-top: 1px solid black;
+    /*border-top: 1px solid black;*/
 }
 
 .view-column {
