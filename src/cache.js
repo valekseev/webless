@@ -61,10 +61,11 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var result=[];
         var lines=data.split('\n');
         var linePos=start;
-        for (var i = 0, l = lines.length; i < l; i++) {
+        // using length - 1 to remove last (incomplete) line
+        for (var i = 0, l = lines.length - 1; i < l; i++) {
             var line = lines[i];
             result.push({position:linePos,line: line});
-            linePos+=line.length;
+            linePos += line.length + 1;
         }
         return result;
     }
@@ -176,6 +177,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
      *
      * @param position
      * @param linesNumber
+     * @param slide should always have the same sign as linesNumber
      * @returns {{lines: Array, promise: (*|promise)}}
      */
     function fetchAndCache(position, linesNumber, slide) {
@@ -184,7 +186,11 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         var isPositive=true;
         var lines=[];
 
-        var absNumber = Math.abs(linesNumber);
+        var absSlide = Math.abs(slide);
+        var absNumber = Math.abs(linesNumber) + absSlide;
+        for (var i = absSlide; i<absNumber; i++) {
+            lines.push({position: position + (isPositive?'+':'-') + i, line: 'Waiting'});
+        }
 
         if (linesNumber < 0) {
             isPositive=false;
@@ -192,20 +198,19 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         } else {
             fetchedPromise = $fetcher.fetch(position, position + chunk);
         }
+
         fetchedPromise.then(function(fetchedEntries) {
             isSorted=false;
-            var count=0;
             var results=[];
             var linkedEntry;
             var prev;
 
             for (var i = 0, l = fetchedEntries.length; i < l; i++) {
                 var fetchedEntry = fetchedEntries[i];
-                if ((i < linesNumber - slide && i >= slide) || (i > l+linesNumber + slide  && i<=linesNumber+slide)) {
-                    results.push({placeHolder:position + (isPositive?'+':'-') + count, line:fetchedEntry});
-                    count++;
+                if ((i < linesNumber + slide && i >= slide) || (i > l+linesNumber + slide  && i<=linesNumber+slide)) {
+                    results.push({placeHolder:position + (isPositive?'+' + i:'-' + (l-i)) , line:fetchedEntry});
                 }
-                if (i == 0 || i == l-1){
+                if (i === 0 || i === l-1){
                     linkedEntry = cache[fetchedEntry.position];
                     if (linkedEntry === undefined) {
                         linkedEntry = createCacheEntry(fetchedEntry.position, fetchedEntry.line);
@@ -222,12 +227,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
 
             deferred.resolve(results);
         });
-
-        for (var i = 0; i<absNumber; i++) {
-            lines.push({position: position + (isPositive?'+':'-') + i, line: 'Waiting'});
-        }
-
-       return {lines:lines,promise:deferred.promise};
+        return {lines:lines,promise:deferred.promise};
     }
 
     this.cacheSize = function () {
