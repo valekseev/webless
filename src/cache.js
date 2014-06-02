@@ -142,13 +142,17 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         for (i=startFrom; i<absNumber; i++) {
             if (entry===undefined) {
                 if ($fetcher.isInit()){
-                    fetched = fetchAndCache(position, isPositive? absNumber-i : i-absNumber);
+                    var fetchSlide = 0;
+                    if (startFrom !== position) {
+                        fetchSlide =  isPositive ? 1:-1;
+                    }
+                    fetched = fetchAndCache(position, isPositive? absNumber-i : i-absNumber, fetchSlide);
                     lines = lines.concat(fetched.lines);
                 }
                 //TODO: handle isInit false
                 break;
             }
-            lines.push({position: position, line: entry.line});
+            lines.push({position: entry.position, line: entry.line});
             position=entry.position;
             entry = isPositive ? entry.next : entry.prev;
         }
@@ -157,6 +161,13 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
         }
         return {lines:lines, promise:fetched.promise};
     };
+
+    function createCacheEntry(position, line) {
+        var entry = {line: line, position: position};
+        cache[position] = entry;
+        positions.push(position);
+        return entry;
+    }
 
     /**
      * Requests some bytes from $fetcher adds all results to cache and returns
@@ -167,7 +178,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
      * @param linesNumber
      * @returns {{lines: Array, promise: (*|promise)}}
      */
-    function fetchAndCache(position, linesNumber) {
+    function fetchAndCache(position, linesNumber, slide) {
         var deferred = $q.defer();
         var fetchedPromise;
         var isPositive=true;
@@ -186,40 +197,28 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
             var count=0;
             var results=[];
             var linkedEntry;
-            var fetchedFirst = fetchedEntries[0];
-            var firstInCache = cache[fetchedFirst.position];
-            if (firstInCache===undefined) {
-                firstInCache = {line: fetchedFirst.line, position: fetchedFirst.position};
-                cache[fetchedFirst.position] = firstInCache;
-                positions.push(fetchedFirst.position);
-            }
-            var prev = firstInCache;
+            var prev;
 
-            for (var i = 1, l = fetchedEntries.length-1; i < l; i++) {
+            for (var i = 0, l = fetchedEntries.length; i < l; i++) {
                 var fetchedEntry = fetchedEntries[i];
-                if (i<=linesNumber || i>=l+linesNumber) {
+                if ((i < linesNumber - slide && i >= slide) || (i > l+linesNumber + slide  && i<=linesNumber+slide)) {
                     results.push({placeHolder:position + (isPositive?'+':'-') + count, line:fetchedEntry});
                     count++;
                 }
-                linkedEntry = {line : fetchedEntry.line, position:fetchedEntry.position};
-                if (prev) {
+                if (i == 0 || i == l-1){
+                    linkedEntry = cache[fetchedEntry.position];
+                    if (linkedEntry === undefined) {
+                        linkedEntry = createCacheEntry(fetchedEntry.position, fetchedEntry.line);
+                    }
+                } else {
+                    linkedEntry = createCacheEntry(fetchedEntry.position, fetchedEntry.line);
+                }
+                if (prev !== undefined) {
                     prev.next = linkedEntry;
                     linkedEntry.prev = prev;
                 }
-                cache[fetchedEntry.position] = linkedEntry;
-                positions.push(fetchedEntry.position);
-                prev=fetchedEntry;
+                prev=linkedEntry;
             }
-
-            var fetchedLast = fetchedEntries[fetchedEntries.length - 1];
-            var lastInCache = cache[fetchedLast.position];
-            if (lastInCache === undefined) {
-                lastInCache = {line: fetchedLast.line, position:fetchedLast.position};
-                cache[fetchedLast.position] = lastInCache;
-                positions.push(fetchedLast.position);
-            }
-            lastInCache.prev = linkedEntry;
-            linkedEntry.next = lastInCache;
 
             deferred.resolve(results);
         });
