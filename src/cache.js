@@ -76,6 +76,11 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     var bs = require('binarysearch');
     var chunk=50000;
 
+    //for debug purposes only
+    this.getAll = function (){
+        return cache;
+    };
+
     this.init = function(url){
         cache={};
         positions=[];
@@ -164,9 +169,12 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     };
 
     function createCacheEntry(position, line) {
-        var entry = {line: line, position: position};
-        cache[position] = entry;
-        positions.push(position);
+        var entry = cache[position];
+        if (entry===undefined) {
+            entry = {line: line, position: position};
+            positions.push(position);
+            cache[position] = entry;
+        }
         return entry;
     }
 
