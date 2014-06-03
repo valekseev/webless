@@ -245,6 +245,25 @@ angular.module('webless.controllers', []).controller('ViewController', function(
         recalculateWrappedMap();
         $scope.viewScroll = Math.min(wrappedToLineMap.length-$scope.viewHeight, lineToWrappedMap[newData.scroll]);
     };
+
+    $scope.renderData = function () {
+        var res="";
+        var cache = $cache.getAll();
+//        $scope.customData = cache;
+        for (var pos in  cache) {
+            var entry = cache[pos];
+            if (entry.prev) {
+                res+=entry.prev.position;
+            }
+            res+="\t" + entry.position + "\t";
+            if (entry.next) {
+                res+=entry.next.position;
+            }
+            res+="\n";
+        }
+        $scope.customData=res;
+    };
+
 });
 
 })(window.angular, window.console);

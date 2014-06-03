@@ -13,7 +13,7 @@
 <div ng-keydown="keyPressed($event)">
     <div>len: {{lines.length}} viewStart: {{lines[0].position}} viewScroll: {{viewScroll}} ({{viewUnwrappedScroll()}})
          | cached: {{cacheSize()}} fileSize: {{fileSize()}} | {{viewStyle()}} </div>
-    <input type="button" ng-click="moveView(1)" value="down"/>
+    <input type="button" ng-click="renderData()" value="Show cache"/>
     <input type="number" ng-model="viewHeight" ng-change="updateViewSize()"/>
     <input type="number" ng-model="viewWidth" ng-change="updateViewSize()"/>
     <label><input type="checkbox" ng-model="isWrapped"/>Wrap</label>
@@ -43,7 +43,7 @@
             <div id="scroll-spacer" class="scroll-spacer"></div>
         </div>
     </div>
-    <!--<div id="data">Data: {{httpData()}}</div>-->
+    <pre id="data">{{customData}}</pre>
 </div>
 </body>
 </html>
