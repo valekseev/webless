@@ -36,8 +36,6 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     var wrappedToLineMap;
     var lineToWrappedMap;
 
-    var lastScreenStart;
-
     //TODO: replace $scope.lines with array-backed map class
     function search(position) {
         for (var i=0, l=$scope.lines.length;i<l;i++) {
@@ -88,7 +86,7 @@ angular.module('webless.controllers', []).controller('ViewController', function(
     $scope.viewStyle = function () {
         return {
             'height': $scope.viewHeight * $scope.lineHeight,
-            'width': $scope.viewWidth * $scope.letterWidth + 21,
+            'width': 70 + 1 +$scope.viewWidth * $scope.letterWidth, //select width + border + viewWidth
             'font-size': $scope.letterHeight  + 'px',
             'white-space': $scope.isWrapped ? 'normal' : 'nowrap'
         };
