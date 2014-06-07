@@ -7,15 +7,15 @@ module.exports = function (grunt) {
     connect: {
       server: {
         options: {
-          port: 8081
+          port: 8080
         }
       }
     }, 
     //HTTP proxy adding bandwidth limits and latency delays simulation
     throttle: {
       default: {
-        remote_port: 8081,
-        local_port: 8080,
+        remote_port: 8080,
+        local_port: 8081,
         upstream: 256*1024,
         downstream: 512*1024,
         keepalive: true,
