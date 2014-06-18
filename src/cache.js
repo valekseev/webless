@@ -149,7 +149,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
             if (entry===undefined) {
                 if ($fetcher.isInit()){
                     var fetchSlide = 0;
-                    if (startFrom !== position) {
+                    if (startFrom !== position || isSkipFirst) {
                         fetchSlide =  isPositive ? 1:-1;
                     }
                     fetched = fetchAndCache(position, isPositive? absNumber-i : i-absNumber, fetchSlide);
@@ -191,7 +191,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
     function fetchAndCache(position, linesNumber, slide) {
         var deferred = $q.defer();
         var fetchedPromise;
-        var isPositive=true;
+        var isPositive=linesNumber >= 0;
         var lines=[];
 
         var absSlide = Math.abs(slide);
@@ -200,8 +200,7 @@ angular.module('webless.services', []).service('$fetcher', function ($q, $http) 
             lines.push({position: position + (isPositive?'+':'-') + i, line: 'Waiting'});
         }
 
-        if (linesNumber < 0) {
-            isPositive=false;
+        if (!isPositive) {
             fetchedPromise = $fetcher.fetch(Math.max(position-chunk, 0), position);
         } else {
             fetchedPromise = $fetcher.fetch(position, position + chunk);
